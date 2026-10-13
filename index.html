@@ -194,7 +194,7 @@ async function sendApproval(){
     }
     for(const id of ['pend-docs','pend-calendario']){const el=document.getElementById(id);if(el&&!el.value){el.setCustomValidity('Selecione uma opção para continuar.');el.reportValidity();el.focus();return;}else if(el)el.setCustomValidity('');}
     const payload=payloadForFlow();
-    if(!confirm('Enviar as decisões para a lista do SharePoint? Esta ação criará um novo registro.')) return;
+    if(!confirm('Enviar as decisões? Esta ação criará um novo registro.')) return;
     btn.disabled=true;btn.textContent='Enviando…';status.style.display='block';status.textContent='Enviando as respostas ao SharePoint…';
     const response=await fetch(FLOW_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
     if(!response.ok)throw new Error('O fluxo retornou HTTP '+response.status+'. Confira o histórico de execução no Power Automate.');
