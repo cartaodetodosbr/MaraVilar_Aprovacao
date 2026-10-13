@@ -195,10 +195,10 @@ async function sendApproval(){
     for(const id of ['pend-docs','pend-calendario']){const el=document.getElementById(id);if(el&&!el.value){el.setCustomValidity('Selecione uma opção para continuar.');el.reportValidity();el.focus();return;}else if(el)el.setCustomValidity('');}
     const payload=payloadForFlow();
     if(!confirm('Enviar as decisões? Esta ação criará um novo registro.')) return;
-    btn.disabled=true;btn.textContent='Enviando…';status.style.display='block';status.textContent='Enviando as respostas ao SharePoint…';
+    btn.disabled=true;btn.textContent='Enviando…';status.style.display='block';status.textContent='Enviando as respostas…';
     const response=await fetch(FLOW_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
     if(!response.ok)throw new Error('O fluxo retornou HTTP '+response.status+'. Confira o histórico de execução no Power Automate.');
-    status.textContent='Envio concluído. Confira a lista do SharePoint para confirmar o registro.';
+    status.textContent='Envio concluído.';
     status.style.background='#e7f7ed';status.style.color='#17663a';
   }catch(err){status.style.display='block';status.style.background='#fff0f0';status.style.color='#9b1c1c';status.textContent='Não foi possível confirmar o envio: '+err.message+'. Se o navegador indicar erro de CORS, será necessário ajustar a forma de integração do fluxo.';}
   finally{btn.disabled=false;btn.textContent='Enviar aprovação';}
