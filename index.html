@@ -148,16 +148,11 @@ function updateSummary(){const names={sobre:'Sobre a Associação',funciona:'Com
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 
 const FLOW_URL = 'https://defaulte93279240f9745ba871f4a124f3343.19.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/11/workflows/3f407b49689746b2b9d34429d230c94e/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=4jZk1lZSc2eI0dS-xFNYWF2MzOR5jpKJcvecP5JzQ_A';
-function detail(key){
-  const box=document.getElementById('detalhe-'+key);
-  const textarea=box?box.querySelector('textarea'):null;
-  return textarea?textarea.value.trim():'';
-}
-
 function payloadForFlow(){
   const r=getRecord();
   const pending=r.pendencias||{}; const crit=r.confirmacoesCriterios||{};
-  const pick=(key)=>{const el=document.getElementById(key);return el?el.value.trim():''};
+  const pick=(key)=>{const el=document.getElementById(key);return el?String(el.value||'').trim():''};
+  const pickPendingText=(key)=>{const el=document.querySelector('[data-pending="'+key+'"]');return el?String(el.value||'').trim():''};
   const dateTime=(v)=>v?(v.length===10?v+'T12:00:00':v):'';
   const yesNo=(v)=>v==='Sim'?'Sim':v==='Não'?'Não':'';
   const result={
@@ -172,7 +167,18 @@ function payloadForFlow(){
     ExistemPrioridadesTematicas:yesNo(crit['crit-prioridade']), DescricaoPrioridadesTematicas:crit['prioridades_tematicas']||'',
     ExisteProcedimentoComplementacao:yesNo(crit['crit-complementacao']), DescricaoComplementacaoDocumental:crit['complementacao_documental']||'',
     ExistemRestricoesNaturezaJuridica:yesNo(crit['crit-natureza']), DescricaoRestricoesNaturezaJuridica:crit['restricoes_natureza_juridica']||'',
-    DecisaoIdentidadeInstitucional:'Informações institucionais detalhadas', TextoOficialIdentidade:['historia','missao','visao','valores'].map(k=>k+' ('+(pending[k+'-sim']||'não informado')+'): '+(pending[k]||'')).join('\n')+'\nData de criação: '+(pending['data-criacao']||'')+'\nOrigem do nome: '+(pending['origem_nome']||''),
+    DecisaoIdentidadeInstitucional:'Usar proposta atual',
+    ExisteHistoriaAssociacao:yesNo(pick('pend-historia-sim')),
+    TextoHistoriaAssociacao:pickPendingText('historia'),
+    ExisteMissao:yesNo(pick('pend-missao-sim')),
+    TextoMissao:pickPendingText('missao'),
+    ExisteVisao:yesNo(pick('pend-visao-sim')),
+    TextoVisao:pickPendingText('visao'),
+    ExistemValores:yesNo(pick('pend-valores-sim')),
+    TextoValores:pickPendingText('valores'),
+    DataCriacaoAssociacao:pick('pend-data-criacao'),
+    OrigemNomeAssociacao:pick('pend-origem-nome'),
+    TextoOficialIdentidade:['historia','missao','visao','valores'].map(k=>k+' ('+(pending[k+'-sim']||'não informado')+'): '+(pickPendingText(k)||'')).join('\n')+'\nData de criação: '+(pick('pend-data-criacao')||'')+'\nOrigem do nome: '+(pick('pend-origem-nome')||''),
     CanalOficialContato:pending.contato||'', ObservacaoContato:pending.contato_observacao||'',
     DecisaoComplementacaoDocumental:(pending.docs||'').startsWith('Não divulgar')?'Não divulgar prazo/procedimento':(pending.docs||'').startsWith('Há procedimento oficial')?'Informar procedimento oficial':(pending.docs||''), ProcedimentoPrazoDocumental:pending.docs_observacao||'',
     DecisaoCalendario2027:(pending.calendario||'').startsWith('Confirmado para publicação')?'Confirmado sem datas exatas':(pending.calendario||''), ObservacaoCalendario2027:pending.calendario_observacao||'',
